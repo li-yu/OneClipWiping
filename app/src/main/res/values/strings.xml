@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">一剪没</string>
+    <string name="notification_title">一剪没</string>
+    <string name="notification_sub_title">一剪就没了正在运行...</string>
+</resources>
