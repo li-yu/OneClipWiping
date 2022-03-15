@@ -4,7 +4,6 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.os.Build
-import android.util.Log
 import android.widget.Toast
 
 /**
@@ -22,7 +21,7 @@ object ClipboardUtil {
                 } else {
                     setPrimaryClip(ClipData.newPlainText(null, null))
                 }
-                Toast.makeText(context, "呼呼~~", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "呼~", Toast.LENGTH_SHORT).show()
             }
 
         }

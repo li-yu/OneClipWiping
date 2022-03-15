@@ -1,26 +1,15 @@
 package cn.liyuyu.oneclipwiping
 
-import android.app.Activity
-import android.content.Context
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.view.WindowManager
-import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.annotation.ColorRes
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import cn.liyuyu.oneclipwiping.ui.screen.MainScreen
 import cn.liyuyu.oneclipwiping.ui.theme.OneClipWipingTheme
 
@@ -29,12 +18,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             OneClipWipingTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    Greeting("Android")
+                    Greeting()
                 }
             }
         }
@@ -43,7 +31,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String) {
+fun Greeting() {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -61,6 +49,6 @@ fun Greeting(name: String) {
 @Composable
 fun DefaultPreview() {
     OneClipWipingTheme {
-        Greeting("Android")
+        Greeting()
     }
 }

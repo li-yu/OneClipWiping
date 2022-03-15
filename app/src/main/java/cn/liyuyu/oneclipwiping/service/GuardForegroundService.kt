@@ -9,8 +9,6 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import cn.liyuyu.oneclipwiping.MainActivity
 import cn.liyuyu.oneclipwiping.R
-import cn.liyuyu.oneclipwiping.utils.ClipboardUtil
-
 
 /**
  * Created by frank on 2022/3/14.

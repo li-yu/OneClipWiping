@@ -8,7 +8,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.Lifecycle
+import cn.liyuyu.oneclipwiping.service.GuardAccessibilityService
 import cn.liyuyu.oneclipwiping.service.GuardForegroundService
+import cn.liyuyu.oneclipwiping.utils.OnLifecycleEvent
+import cn.liyuyu.oneclipwiping.utils.StateUtil
 
 /**
  * Created by frank on 2022/3/14.
@@ -17,16 +21,25 @@ import cn.liyuyu.oneclipwiping.service.GuardForegroundService
 fun MainScreen() {
     var isRunning by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    OnLifecycleEvent { owner, event ->
+        when (event) {
+            Lifecycle.Event.ON_RESUME -> {
+                isRunning = StateUtil.isGasEnabled(context)
+            }
+        }
+    }
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Switch(
             checked = isRunning, onCheckedChange = {
-                isRunning = !isRunning
                 if (isRunning) {
-                    val intent = Intent(context, GuardForegroundService::class.java)
-                    context.startService(intent)
-                } else {
+                    GuardAccessibilityService.instance?.disableSelf()
                     val intent = Intent(context, GuardForegroundService::class.java)
                     context.stopService(intent)
+                    isRunning = false
+                } else {
+                    StateUtil.gotoAccessibilityServiceSettings(context)
+                    val intent = Intent(context, GuardForegroundService::class.java)
+                    context.startService(intent)
                 }
             }
         )
