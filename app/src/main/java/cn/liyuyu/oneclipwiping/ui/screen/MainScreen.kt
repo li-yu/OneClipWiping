@@ -4,11 +4,14 @@ import android.content.Intent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Switch
+import androidx.compose.material.SwitchDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.lifecycle.Lifecycle
+import cn.liyuyu.oneclipwiping.R
 import cn.liyuyu.oneclipwiping.service.GuardAccessibilityService
 import cn.liyuyu.oneclipwiping.service.GuardForegroundService
 import cn.liyuyu.oneclipwiping.utils.OnLifecycleEvent
@@ -31,7 +34,8 @@ fun MainScreen() {
     }
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Switch(
-            checked = isRunning, onCheckedChange = {
+            checked = isRunning,
+            onCheckedChange = {
                 if (isRunning) {
                     GuardAccessibilityService.instance?.disableSelf()
                     val intent = Intent(context, GuardForegroundService::class.java)
@@ -42,7 +46,8 @@ fun MainScreen() {
                     val intent = Intent(context, GuardForegroundService::class.java)
                     context.startService(intent)
                 }
-            }
+            },
+            colors = SwitchDefaults.colors(checkedThumbColor = colorResource(id = R.color.main))
         )
     }
 }
