@@ -21,11 +21,12 @@ import cn.liyuyu.oneclipwiping.utils.StateUtil
 fun MainScreen() {
     var isRunning by remember { mutableStateOf(false) }
     val context = LocalContext.current
-    OnLifecycleEvent { owner, event ->
+    OnLifecycleEvent { _, event ->
         when (event) {
             Lifecycle.Event.ON_RESUME -> {
                 isRunning = StateUtil.isGasEnabled(context)
             }
+            else -> {}
         }
     }
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

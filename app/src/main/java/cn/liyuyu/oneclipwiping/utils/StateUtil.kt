@@ -1,6 +1,5 @@
 package cn.liyuyu.oneclipwiping.utils
 
-import android.accessibilityservice.AccessibilityService
 import android.content.Context
 import android.content.Intent
 import android.provider.Settings
@@ -28,7 +27,7 @@ object StateUtil {
     }
 
     /**
-     *
+     * 前往无障碍服务设置页面
      */
     fun gotoAccessibilityServiceSettings(context: Context) {
         context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
