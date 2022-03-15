@@ -62,16 +62,15 @@ class ForegroundNotification(private val service: GuardForegroundService) :
                 notificationIntent.addCategory(Intent.CATEGORY_LAUNCHER)
                 notificationIntent.flags =
                     Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
-                var pendingIntent: PendingIntent? = null
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    pendingIntent = PendingIntent.getActivity(
+                var pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    PendingIntent.getActivity(
                         this,
                         2140,
                         notificationIntent,
                         PendingIntent.FLAG_MUTABLE
                     )
                 } else {
-                    pendingIntent = PendingIntent.getActivity(
+                    PendingIntent.getActivity(
                         this, 2140,
                         notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT
                     )
