@@ -23,12 +23,12 @@ class GuardAccessibilityService : AccessibilityService() {
         val scope = MainScope()
     }
 
-    override fun onCreate() {
-        super.onCreate()
+    override fun onServiceConnected() {
+        super.onServiceConnected()
         instance = this
         Handler(Looper.getMainLooper()).postDelayed({
             windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        }, 1000)
+        }, 100)
     }
 
     override fun onDestroy() {
@@ -62,27 +62,29 @@ class GuardAccessibilityService : AccessibilityService() {
      * 开启悬浮窗获取焦点，清空剪贴板
      */
     private fun clearClipboard() {
-        if (shadowView == null) {
-            shadowView = View(this)
-        }
+        shadowView = View(this)
         val layoutParams = WindowManager.LayoutParams(
-            WindowManager.LayoutParams.WRAP_CONTENT,
-            WindowManager.LayoutParams.WRAP_CONTENT,
+            1,
+            1,
             WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
             WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
             PixelFormat.TRANSPARENT
         )
-
-        shadowView?.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
-            override fun onViewAttachedToWindow(p0: View?) {
-                ClipboardUtil.clear(this@GuardAccessibilityService)
-                windowManager?.removeView(shadowView)
+        val listener = object : View.OnAttachStateChangeListener {
+            override fun onViewAttachedToWindow(v: View?) {
+                v?.post {
+                    ClipboardUtil.clear(this@GuardAccessibilityService)
+                    windowManager?.removeView(shadowView)
+                    shadowView?.removeOnAttachStateChangeListener(this)
+                    shadowView = null
+                }
             }
 
             override fun onViewDetachedFromWindow(p0: View?) {
             }
 
-        })
+        }
+        shadowView?.addOnAttachStateChangeListener(listener)
         windowManager?.addView(shadowView, layoutParams)
     }
 
