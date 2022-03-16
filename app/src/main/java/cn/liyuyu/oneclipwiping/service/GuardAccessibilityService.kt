@@ -59,6 +59,7 @@ class GuardAccessibilityService : AccessibilityService() {
     override fun onInterrupt() {
     }
 
+    @Synchronized
     fun waitClearClipboard(){
         MainScope().launch {
             delay(5000)

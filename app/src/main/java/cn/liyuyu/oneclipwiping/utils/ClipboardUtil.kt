@@ -6,6 +6,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import cn.liyuyu.oneclipwiping.BuildConfig
@@ -25,6 +26,7 @@ object ClipboardUtil {
         val clipboardManager =
             context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         clipboardManager.addPrimaryClipChangedListener {
+            Log.d("frank", "ignored")
         }
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P &&
             ContextCompat.checkSelfPermission(
@@ -50,10 +52,10 @@ object ClipboardUtil {
                             process.inputStream
                         )
                     )
-                    val iterator = process.inputStream.bufferedReader().lineSequence().iterator()
-                    while (iterator.hasNext()) {
-                        val line = iterator.next()
-                        if (line.contains(BuildConfig.APPLICATION_ID)) {
+                    var line: String? = ""
+                    while (line != null) {
+                        line = bufferedReader.readLine()
+                        if (line?.contains(BuildConfig.APPLICATION_ID) == true) {
                             GuardAccessibilityService.instance?.waitClearClipboard()
                         }
                     }
