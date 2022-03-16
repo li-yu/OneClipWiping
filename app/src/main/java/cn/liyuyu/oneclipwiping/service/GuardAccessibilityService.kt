@@ -3,6 +3,7 @@ package cn.liyuyu.oneclipwiping.service
 import android.accessibilityservice.AccessibilityService
 import android.content.Context
 import android.graphics.PixelFormat
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
@@ -26,6 +27,7 @@ class GuardAccessibilityService : AccessibilityService() {
         super.onServiceConnected()
         instance = this
         windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        ClipboardUtil.startListen(this)
     }
 
     override fun onDestroy() {
@@ -45,16 +47,23 @@ class GuardAccessibilityService : AccessibilityService() {
                 if (event.className == "android.widget.Toast" && event.text.joinToString()
                         .contains("已复制")
                 ) {
-                    MainScope().launch {
-                        delay(10000)
-                        clearClipboard()
-                    }
+//                    MainScope().launch {
+//                        delay(10000)
+//                        clearClipboard()
+//                    }
                 }
             }
         }
     }
 
     override fun onInterrupt() {
+    }
+
+    fun waitClearClipboard(){
+        MainScope().launch {
+            delay(5000)
+            clearClipboard()
+        }
     }
 
     /**
