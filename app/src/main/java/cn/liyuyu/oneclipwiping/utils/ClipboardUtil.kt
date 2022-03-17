@@ -10,7 +10,11 @@ import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import cn.liyuyu.oneclipwiping.BuildConfig
+import cn.liyuyu.oneclipwiping.interceptor.ClipSnapshot
 import cn.liyuyu.oneclipwiping.service.GuardAccessibilityService
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.text.SimpleDateFormat
@@ -22,7 +26,7 @@ import java.util.*
  */
 object ClipboardUtil {
 
-    fun startListen(context: Context) {
+    fun listenClipChanged(context: Context, scope: CoroutineScope) {
         val clipboardManager =
             context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         clipboardManager.addPrimaryClipChangedListener {
@@ -34,10 +38,13 @@ object ClipboardUtil {
                 Manifest.permission.READ_LOGS
             ) == PackageManager.PERMISSION_GRANTED
         ) {
-            Thread {
+            scope.launch(Dispatchers.IO) {
                 try {
                     val timeStamp: String =
-                        SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(Date())
+                        SimpleDateFormat(
+                            "yyyy-MM-dd HH:mm:ss.SSS",
+                            Locale.getDefault()
+                        ).format(Date())
                     val process = Runtime.getRuntime().exec(
                         arrayOf(
                             "logcat",
@@ -56,22 +63,45 @@ object ClipboardUtil {
                     while (line != null) {
                         line = bufferedReader.readLine()
                         if (line?.contains(BuildConfig.APPLICATION_ID) == true) {
-                            GuardAccessibilityService.instance?.waitClearClipboard()
+                            GuardAccessibilityService.instance?.waitCleanClipboard()
                         }
                     }
                 } catch (ignored: Exception) {
                 }
-            }.start()
+            }
+        } else {
+            Toast.makeText(context.applicationContext, "无法监听，缺少 READ_LOGS 权限！", Toast.LENGTH_SHORT)
+                .show()
         }
-
-
     }
 
-    fun clear(context: Context) {
+    /**
+     * 获取当前剪贴板的快照
+     */
+    fun snapshoot(context: Context): ClipSnapshot? {
         val clipboardManager =
             context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         with(clipboardManager) {
-            if (clipboardManager.hasPrimaryClip()) {
+            return if (hasPrimaryClip()) {
+                val text = primaryClip?.getItemAt(0)?.coerceToText(context).toString()
+                ClipSnapshot(
+                    System.currentTimeMillis(),
+                    text,
+                    GuardAccessibilityService.instance?.topPackageName
+                )
+            } else {
+                null
+            }
+
+        }
+
+    }
+
+    fun clean(context: Context) {
+        val clipboardManager =
+            context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        with(clipboardManager) {
+            if (hasPrimaryClip()) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                     clearPrimaryClip()
                 } else {

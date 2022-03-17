@@ -3,7 +3,6 @@ package cn.liyuyu.oneclipwiping.service
 import android.accessibilityservice.AccessibilityService
 import android.content.Context
 import android.graphics.PixelFormat
-import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
@@ -21,13 +20,20 @@ class GuardAccessibilityService : AccessibilityService() {
         var instance: GuardAccessibilityService? = null
     }
 
+    private val scope = MainScope()
+
     private var windowManager: WindowManager? = null
+
+    @Volatile
+    private var hasClip = false
+
+    var topPackageName: String? = null
 
     override fun onServiceConnected() {
         super.onServiceConnected()
         instance = this
         windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        ClipboardUtil.startListen(this)
+        ClipboardUtil.listenClipChanged(this, scope)
     }
 
     override fun onDestroy() {
@@ -38,19 +44,20 @@ class GuardAccessibilityService : AccessibilityService() {
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         when (event?.eventType) {
+            AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {
+                topPackageName = event.packageName.toString()
+            }
             AccessibilityEvent.TYPE_VIEW_CLICKED -> {
                 if (event.text.joinToString().contains("粘贴")) {
-                    clearClipboard()
+                    cleanClipboard()
                 }
             }
             AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED -> {
-                if (event.className == "android.widget.Toast" && event.text.joinToString()
-                        .contains("已复制")
-                ) {
-//                    MainScope().launch {
-//                        delay(10000)
-//                        clearClipboard()
-//                    }
+                if (event.className == "android.widget.Toast") {
+                    val keys = event.text.joinToString()
+                    if (keys.contains("复制") || keys.contains("剪切")) {
+                        waitCleanClipboard()
+                    }
                 }
             }
         }
@@ -60,17 +67,31 @@ class GuardAccessibilityService : AccessibilityService() {
     }
 
     @Synchronized
-    fun waitClearClipboard(){
-        MainScope().launch {
-            delay(5000)
-            clearClipboard()
+    fun waitCleanClipboard() {
+        hasClip = true
+        scope.launch {
+            delay(30000)
+            if (hasClip) {
+                cleanClipboard()
+            }
         }
     }
 
     /**
      * 开启悬浮窗获取焦点，清空剪贴板
      */
-    private fun clearClipboard() {
+    @Synchronized
+    private fun cleanClipboard() {
+        callClipboard {
+            ClipboardUtil.clean(this@GuardAccessibilityService)
+            hasClip = false
+        }
+    }
+
+    /**
+     * 只有等悬浮窗获取焦点后才能拿到剪贴板操作
+     */
+    private fun callClipboard(block: () -> Unit) {
         var shadowView: View? = View(this)
         val layoutParams = WindowManager.LayoutParams(
             1,
@@ -81,7 +102,7 @@ class GuardAccessibilityService : AccessibilityService() {
         )
         val listener = object : View.OnAttachStateChangeListener {
             override fun onViewAttachedToWindow(v: View?) {
-                ClipboardUtil.clear(this@GuardAccessibilityService)
+                block()
                 windowManager?.removeView(shadowView)
                 shadowView?.removeOnAttachStateChangeListener(this)
                 shadowView = null
@@ -94,5 +115,4 @@ class GuardAccessibilityService : AccessibilityService() {
         shadowView?.addOnAttachStateChangeListener(listener)
         windowManager?.addView(shadowView, layoutParams)
     }
-
 }
