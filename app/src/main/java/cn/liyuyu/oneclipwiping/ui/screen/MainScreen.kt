@@ -11,6 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.lifecycle.Lifecycle
+import androidx.navigation.NavController
+import cn.liyuyu.oneclipwiping.MainViewModel
 import cn.liyuyu.oneclipwiping.R
 import cn.liyuyu.oneclipwiping.service.GuardAccessibilityService
 import cn.liyuyu.oneclipwiping.service.GuardForegroundService
@@ -21,7 +23,7 @@ import cn.liyuyu.oneclipwiping.utils.StateUtil
  * Created by frank on 2022/3/14.
  */
 @Composable
-fun MainScreen() {
+fun MainScreen(navController: NavController, viewModel: MainViewModel) {
     var isRunning by remember { mutableStateOf(false) }
     val context = LocalContext.current
     OnLifecycleEvent { _, event ->
