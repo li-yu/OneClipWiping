@@ -70,7 +70,7 @@ object ClipboardUtil {
                 }
             }
         } else {
-            Toast.makeText(context.applicationContext, "无法监听，缺少 READ_LOGS 权限！", Toast.LENGTH_SHORT)
+            Toast.makeText(context.applicationContext, "缺少 READ_LOGS 权限！", Toast.LENGTH_SHORT)
                 .show()
         }
     }

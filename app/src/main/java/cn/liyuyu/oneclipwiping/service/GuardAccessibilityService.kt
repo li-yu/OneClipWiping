@@ -70,7 +70,7 @@ class GuardAccessibilityService : AccessibilityService() {
     fun waitCleanClipboard() {
         hasClip = true
         scope.launch {
-            delay(30000)
+            delay(15000)
             if (hasClip) {
                 cleanClipboard()
             }
