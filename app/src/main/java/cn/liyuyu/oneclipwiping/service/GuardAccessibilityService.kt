@@ -25,7 +25,7 @@ class GuardAccessibilityService : AccessibilityService() {
     private var windowManager: WindowManager? = null
 
     @Volatile
-    private var hasClip = false
+    private var hasClippingData = false
 
     var topPackageName: String? = null
 
@@ -68,10 +68,10 @@ class GuardAccessibilityService : AccessibilityService() {
 
     @Synchronized
     fun waitCleanClipboard() {
-        hasClip = true
+        hasClippingData = true
         scope.launch {
             delay(15000)
-            if (hasClip) {
+            if (hasClippingData) {
                 cleanClipboard()
             }
         }
@@ -84,7 +84,7 @@ class GuardAccessibilityService : AccessibilityService() {
     private fun cleanClipboard() {
         callClipboard {
             ClipboardUtil.clean(this@GuardAccessibilityService)
-            hasClip = false
+            hasClippingData = false
         }
     }
 

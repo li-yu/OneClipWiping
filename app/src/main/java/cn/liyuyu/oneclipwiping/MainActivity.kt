@@ -10,12 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import cn.liyuyu.oneclipwiping.ui.screen.MainScreen
-import cn.liyuyu.oneclipwiping.ui.screen.Screen
-import cn.liyuyu.oneclipwiping.ui.screen.SettingsScreen
 import cn.liyuyu.oneclipwiping.ui.theme.OneClipWipingTheme
 
 class MainActivity : ComponentActivity() {
@@ -37,8 +32,6 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Greeting(viewModel: MainViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
-    val navController = rememberNavController()
-    var isMainScreen by remember { mutableStateOf(true) }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -48,16 +41,7 @@ fun Greeting(viewModel: MainViewModel = androidx.lifecycle.viewmodel.compose.vie
             )
         }
     ) {
-        NavHost(navController = navController, startDestination = Screen.Main.routeName) {
-            composable(Screen.Main.routeName) {
-                isMainScreen = true
-                MainScreen(navController, viewModel)
-            }
-            composable(Screen.Settings.routeName) {
-                isMainScreen = false
-                SettingsScreen(navController, viewModel)
-            }
-        }
+        MainScreen(viewModel)
     }
 }
 
