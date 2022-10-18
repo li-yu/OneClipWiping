@@ -112,6 +112,6 @@ class ForegroundNotification(private val service: GuardForegroundService) :
 
     fun stopForegroundNotification() {
         mNotificationManager?.cancelAll()
-        service.stopForeground(true)
+        service.stopForeground(Service.STOP_FOREGROUND_REMOVE)
     }
 }

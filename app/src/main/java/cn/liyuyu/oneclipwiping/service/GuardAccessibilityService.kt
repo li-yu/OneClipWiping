@@ -101,14 +101,14 @@ class GuardAccessibilityService : AccessibilityService() {
             PixelFormat.TRANSPARENT
         )
         val listener = object : View.OnAttachStateChangeListener {
-            override fun onViewAttachedToWindow(v: View?) {
+            override fun onViewAttachedToWindow(v: View) {
                 block()
                 windowManager?.removeView(shadowView)
                 shadowView?.removeOnAttachStateChangeListener(this)
                 shadowView = null
             }
 
-            override fun onViewDetachedFromWindow(p0: View?) {
+            override fun onViewDetachedFromWindow(p0: View) {
             }
 
         }
